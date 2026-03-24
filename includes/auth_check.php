@@ -1,0 +1,1 @@
+redirects guests → login (include at top of protected pages)

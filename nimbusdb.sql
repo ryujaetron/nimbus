@@ -1,0 +1,394 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Mar 24, 2026 at 03:12 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `nimbusdb`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `added_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `url` varchar(120) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `url`, `created_at`) VALUES
+(1, 'Motorcycle Parts', 'motorcycle-parts', '2026-03-24 02:05:31'),
+(2, 'Riding Gear', 'riding-gear', '2026-03-24 02:05:31'),
+(3, 'Accessories', 'accessories', '2026-03-24 02:05:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `coupons`
+--
+
+CREATE TABLE `coupons` (
+  `id` int(11) NOT NULL,
+  `code` varchar(50) NOT NULL,
+  `type` enum('percent','fixed') NOT NULL DEFAULT 'percent',
+  `value` decimal(10,2) NOT NULL,
+  `min_order` decimal(10,2) DEFAULT 0.00,
+  `max_uses` int(11) DEFAULT NULL,
+  `used_count` int(11) DEFAULT 0,
+  `expires_at` datetime DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `coupons`
+--
+
+INSERT INTO `coupons` (`id`, `code`, `type`, `value`, `min_order`, `max_uses`, `used_count`, `expires_at`, `is_active`, `created_at`) VALUES
+(1, 'RIDE10', 'percent', 10.00, 1000.00, 100, 0, NULL, 1, '2026-03-24 02:05:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `coupon_id` int(11) DEFAULT NULL,
+  `recipient_name` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(255) NOT NULL,
+  `city` varchar(100) NOT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `zip_code` varchar(20) DEFAULT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `discount` decimal(10,2) DEFAULT 0.00,
+  `shipping_fee` decimal(10,2) DEFAULT 0.00,
+  `total` decimal(10,2) NOT NULL,
+  `status` enum('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
+  `payment_method` varchar(50) DEFAULT 'cod',
+  `payment_status` enum('unpaid','paid') DEFAULT 'unpaid',
+  `notes` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `products`
+--
+
+CREATE TABLE `products` (
+  `id` int(11) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `url` varchar(280) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `sale_price` decimal(10,2) DEFAULT NULL,
+  `stock` int(11) NOT NULL DEFAULT 0,
+  `image` varchar(255) DEFAULT NULL,
+  `is_featured` tinyint(1) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `category_id`, `name`, `url`, `description`, `price`, `sale_price`, `stock`, `image`, `is_featured`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 2, 'Full Face Helmet', 'full-face-helmet', 'DOT approved full face motorcycle helmet with visor.', 3500.00, 2999.00, 40, NULL, 1, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
+(2, 3, 'Motorcycle Phone Mount', 'motorcycle-phone-mount', 'Handlebar phone holder with anti-vibration design.', 799.00, NULL, 60, NULL, 0, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
+(3, 2, 'Riding Gloves', 'riding-gloves', 'Breathable anti-slip motorcycle riding gloves.', 499.00, NULL, 80, NULL, 1, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
+(4, 1, 'LED Headlight Bulb', 'led-headlight-bulb', 'High brightness LED bulb for motorcycles.', 899.00, NULL, 50, NULL, 0, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `rating` tinyint(1) NOT NULL CHECK (`rating` between 1 and 5),
+  `comment` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(191) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('customer','admin') DEFAULT 'customer',
+  `phone` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `phone`, `created_at`) VALUES
+(1, 'Admin', 'admin@nimbus.com', '$2y$12$hash', 'admin', NULL, '2026-03-24 02:05:31'),
+(2, 'Juan dela Cruz', 'juan@email.com', '$2y$12$hash', 'customer', NULL, '2026-03-24 02:05:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlists`
+--
+
+CREATE TABLE `wishlists` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_product` (`user_id`,`product_id`),
+  ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `url` (`url`);
+
+--
+-- Indexes for table `coupons`
+--
+ALTER TABLE `coupons`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_user` (`user_id`),
+  ADD KEY `order_coupon` (`coupon_id`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `oi_order` (`order_id`),
+  ADD KEY `oi_product` (`product_id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `url` (`url`),
+  ADD KEY `category_id` (`category_id`);
+
+--
+-- Indexes for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `review_user` (`user_id`),
+  ADD KEY `review_product` (`product_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_product_wish` (`user_id`,`product_id`),
+  ADD KEY `wishlist_product` (`product_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `coupons`
+--
+ALTER TABLE `coupons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `cart_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `order_coupon` FOREIGN KEY (`coupon_id`) REFERENCES `coupons` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `order_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `oi_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `oi_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `prod_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `review_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `review_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD CONSTRAINT `wishlist_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

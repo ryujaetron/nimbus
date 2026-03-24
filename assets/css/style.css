@@ -1,0 +1,37 @@
+.custom-bg {
+  background-color: #20c997;
+}
+
+.card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background-color: #20c997;
+  border-color: #20c997;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #199c7a;
+  border-color: #199c7a;
+  transform: translateY(-2px);
+}
+
+.form-control {
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+}
+
+/* Password helper list */
+#password-help ul {
+  padding-left: 20px;
+  margin: 5px 0;
+  list-style-type: disc;
+  color: #000;
+}

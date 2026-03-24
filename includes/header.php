@@ -1,0 +1,1 @@
+navbar, session start, meta tags

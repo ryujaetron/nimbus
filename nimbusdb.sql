@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 24, 2026 at 03:12 AM
+-- Generation Time: Mar 24, 2026 at 09:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,9 +53,9 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `url`, `created_at`) VALUES
-(1, 'Motorcycle Parts', 'motorcycle-parts', '2026-03-24 02:05:31'),
-(2, 'Riding Gear', 'riding-gear', '2026-03-24 02:05:31'),
-(3, 'Accessories', 'accessories', '2026-03-24 02:05:31');
+(1, 'Motorcycle Parts', 'motorcycle-parts', '2026-03-24 07:53:58'),
+(2, 'Riding Gear', 'riding-gear', '2026-03-24 07:53:58'),
+(3, 'Accessories', 'accessories', '2026-03-24 07:53:58');
 
 -- --------------------------------------------------------
 
@@ -81,7 +81,7 @@ CREATE TABLE `coupons` (
 --
 
 INSERT INTO `coupons` (`id`, `code`, `type`, `value`, `min_order`, `max_uses`, `used_count`, `expires_at`, `is_active`, `created_at`) VALUES
-(1, 'RIDE10', 'percent', 10.00, 1000.00, 100, 0, NULL, 1, '2026-03-24 02:05:31');
+(1, 'RIDE10', 'percent', 10.00, 1000.00, 100, 0, NULL, 1, '2026-03-24 07:53:58');
 
 -- --------------------------------------------------------
 
@@ -155,10 +155,10 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `category_id`, `name`, `url`, `description`, `price`, `sale_price`, `stock`, `image`, `is_featured`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 2, 'Full Face Helmet', 'full-face-helmet', 'DOT approved full face motorcycle helmet with visor.', 3500.00, 2999.00, 40, NULL, 1, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
-(2, 3, 'Motorcycle Phone Mount', 'motorcycle-phone-mount', 'Handlebar phone holder with anti-vibration design.', 799.00, NULL, 60, NULL, 0, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
-(3, 2, 'Riding Gloves', 'riding-gloves', 'Breathable anti-slip motorcycle riding gloves.', 499.00, NULL, 80, NULL, 1, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31'),
-(4, 1, 'LED Headlight Bulb', 'led-headlight-bulb', 'High brightness LED bulb for motorcycles.', 899.00, NULL, 50, NULL, 0, 1, '2026-03-24 02:05:31', '2026-03-24 02:05:31');
+(1, 2, 'Full Face Helmet', 'full-face-helmet', 'DOT approved full face motorcycle helmet with visor.', 3500.00, 2999.00, 40, NULL, 1, 1, '2026-03-24 07:53:58', '2026-03-24 07:53:58'),
+(2, 3, 'Motorcycle Phone Mount', 'motorcycle-phone-mount', 'Handlebar phone holder with anti-vibration design.', 799.00, NULL, 60, NULL, 0, 1, '2026-03-24 07:53:58', '2026-03-24 07:53:58'),
+(3, 2, 'Riding Gloves', 'riding-gloves', 'Breathable anti-slip motorcycle riding gloves.', 499.00, NULL, 80, NULL, 1, 1, '2026-03-24 07:53:58', '2026-03-24 07:53:58'),
+(4, 1, 'LED Headlight Bulb', 'led-headlight-bulb', 'High brightness LED bulb for motorcycles.', 899.00, NULL, 50, NULL, 0, 1, '2026-03-24 07:53:58', '2026-03-24 07:53:58');
 
 -- --------------------------------------------------------
 
@@ -183,7 +183,8 @@ CREATE TABLE `reviews` (
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
   `email` varchar(191) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('customer','admin') DEFAULT 'customer',
@@ -195,9 +196,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `phone`, `created_at`) VALUES
-(1, 'Admin', 'admin@nimbus.com', '$2y$12$hash', 'admin', NULL, '2026-03-24 02:05:31'),
-(2, 'Juan dela Cruz', 'juan@email.com', '$2y$12$hash', 'customer', NULL, '2026-03-24 02:05:31');
+INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`, `password`, `role`, `phone`, `created_at`) VALUES
+(1, 'Admin', 'User', 'admin@nimbus.com', '$2y$12$hash', 'admin', NULL, '2026-03-24 07:53:58'),
+(2, 'Juan', 'dela Cruz', 'juan@email.com', '$2y$12$hash', 'customer', NULL, '2026-03-24 07:53:58');
 
 -- --------------------------------------------------------
 

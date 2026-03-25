@@ -1,1 +1,1 @@
- redirects non-admins → 403 (include in admin pages)
+blocks non-admins, redirects to 403

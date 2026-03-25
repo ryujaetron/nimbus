@@ -1,1 +1,1 @@
-closing tags, scripts
+closing tags, JS scripts

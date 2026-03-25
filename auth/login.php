@@ -11,7 +11,7 @@ if (isset($_SESSION['user_id'])) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Nimbus</title>
+    <title>Login - CartHive</title>
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -25,7 +25,7 @@ if (isset($_SESSION['user_id'])) {
       style="min-height: 100vh"
     >
       <div class="card p-4 shadow" style="width: 350px">
-        <h2 class="text-center mb-4">Nimbus</h2>
+        <h2 class="text-center mb-4">CartHive</h2>
 
         <div id="alert-message" class="alert d-none" role="alert"></div>
 

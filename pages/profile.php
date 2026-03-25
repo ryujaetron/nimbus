@@ -1,2 +1,1 @@
-edit account info
-
+edit name, email, phone, password

@@ -1,1 +1,1 @@
-thank you / receipt page
+receipt after purchase

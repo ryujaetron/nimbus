@@ -1,5 +1,6 @@
 /**
  * Wishlist JavaScript Functions
+ * Enhanced with better notifications and badge updates
  */
 
 // Toggle wishlist status
@@ -24,10 +25,11 @@ async function toggleWishlist(productId, button) {
             updateWishlistButton(button, !isInWishlist);
 
             // Update wishlist count in navbar
-            updateWishlistCount(isInWishlist ? -1 : 1);
+            updateWishlistBadge(isInWishlist ? -1 : 1);
 
             // Show notification
-            showWishlistNotification(data.message, 'success');
+            const icon = isInWishlist ? 'heart' : 'heart-fill';
+            showWishlistNotification(data.message, 'success', icon);
         } else {
             showWishlistNotification(data.message || 'Failed to update wishlist', 'error');
         }
@@ -52,29 +54,47 @@ function updateWishlistButton(button, isInWishlist) {
     }
 }
 
-// Update wishlist count in navbar
-function updateWishlistCount(change) {
+// Update wishlist badge with animation
+function updateWishlistBadge(change, animate = true) {
     const wishlistLink = document.querySelector('a[href="wishlist.php"]');
     if (!wishlistLink) return;
 
-    let wishlistBadge = wishlistLink.querySelector('.badge');
+    let badge = wishlistLink.querySelector('.badge');
 
-    if (wishlistBadge) {
-        const currentCount = parseInt(wishlistBadge.textContent) || 0;
+    if (badge) {
+        const currentCount = parseInt(badge.textContent) || 0;
         const newCount = Math.max(0, currentCount + change);
 
         if (newCount > 0) {
-            wishlistBadge.textContent = newCount;
-            wishlistBadge.style.display = 'inline';
+            badge.textContent = newCount;
+            badge.style.display = 'inline';
+
+            // Add bounce animation
+            if (animate) {
+                badge.style.transform = 'scale(1.3)';
+                badge.style.transition = 'transform 0.2s ease';
+                setTimeout(() => {
+                    badge.style.transform = 'scale(1)';
+                }, 200);
+            }
         } else {
-            wishlistBadge.remove();
+            badge.remove();
         }
     } else if (change > 0) {
         // Create badge if it doesn't exist
-        const badge = document.createElement('span');
-        badge.className = 'badge bg-danger';
-        badge.textContent = '1';
-        wishlistLink.appendChild(badge);
+        const newBadge = document.createElement('span');
+        newBadge.className = 'badge bg-danger';
+        newBadge.textContent = '1';
+        wishlistLink.appendChild(newBadge);
+
+        // Add bounce animation
+        if (animate) {
+            newBadge.style.transform = 'scale(1.3)';
+            newBadge.style.transition = 'transform 0.2s ease';
+            setTimeout(() => {
+                newBadge.style.transform = 'scale(1)';
+            }, 200);
+        }
     }
 }
 
@@ -107,22 +127,60 @@ async function checkWishlistStatus(productIds) {
     }
 }
 
-// Show wishlist notification
-function showWishlistNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existing = document.querySelector('.wishlist-notification');
-    if (existing) existing.remove();
+// Enhanced wishlist notification with icons
+function showWishlistNotification(message, type = 'info', icon = 'heart') {
+    // Remove existing wishlist notifications
+    const existing = document.querySelectorAll('.wishlist-notification');
+    existing.forEach(el => el.remove());
 
+    // Determine colors
+    let bgColor, iconClass;
+    switch(type) {
+        case 'success':
+            bgColor = 'bg-danger'; // Use red/pink for wishlist (heart theme)
+            iconClass = `bi-${icon}`;
+            break;
+        case 'error':
+            bgColor = 'bg-secondary';
+            iconClass = 'bi-x-circle';
+            break;
+        default:
+            bgColor = 'bg-info';
+            iconClass = 'bi-info-circle';
+    }
+
+    // Create notification element
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : 'success'} wishlist-notification position-fixed`;
-    notification.style.cssText = 'top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 280px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
-    notification.innerHTML = `<i class="bi bi-${type === 'error' ? 'x-circle' : 'heart-fill'}"></i> ${message}`;
+    notification.className = `wishlist-notification position-fixed d-flex align-items-center gap-2 text-white px-4 py-3 rounded-3 shadow-lg ${bgColor}`;
+    notification.style.cssText = `
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        z-index: 10000;
+        min-width: 280px;
+        max-width: 400px;
+        opacity: 0;
+        transition: all 0.3s ease;
+    `;
+
+    notification.innerHTML = `
+        <i class="bi ${iconClass}" style="font-size: 1.25rem;"></i>
+        <span style="flex: 1;">${message}</span>
+        <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.75rem;" onclick="this.parentElement.remove()"></button>
+    `;
 
     document.body.appendChild(notification);
 
+    // Animate in
+    requestAnimationFrame(() => {
+        notification.style.transform = 'translateX(-50%) translateY(0)';
+        notification.style.opacity = '1';
+    });
+
+    // Auto remove after 2.5 seconds
     setTimeout(() => {
+        notification.style.transform = 'translateX(-50%) translateY(-20px)';
         notification.style.opacity = '0';
-        notification.style.transition = 'opacity 0.3s';
         setTimeout(() => notification.remove(), 300);
     }, 2500);
 }

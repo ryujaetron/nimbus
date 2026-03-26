@@ -1,5 +1,6 @@
 /**
  * CartHive - Shopping Cart JavaScript
+ * Enhanced with better notifications and badge updates
  */
 
 // Add product to cart
@@ -18,11 +19,11 @@ async function addToCart(productId, quantity = 1) {
         const data = await response.json();
 
         if (data.success) {
-            // Update cart count badge
-            updateCartCount(data.cart_count);
+            // Update cart count badge with animation
+            updateCartBadge(data.cart_count);
 
             // Show success notification
-            showNotification(data.message, 'success');
+            showCartNotification(data.message, 'success', 'cart-plus');
 
             // Open cart sidebar
             openCart();
@@ -30,11 +31,11 @@ async function addToCart(productId, quantity = 1) {
             // Reload cart items
             loadCartItems();
         } else {
-            showNotification(data.message, 'error');
+            showCartNotification(data.message || 'Failed to add to cart', 'error', 'x-circle');
         }
     } catch (error) {
         console.error('Error adding to cart:', error);
-        showNotification('Failed to add to cart', 'error');
+        showCartNotification('Failed to add to cart', 'error', 'x-circle');
     }
 }
 
@@ -53,20 +54,25 @@ async function removeFromCart(cartId) {
         const data = await response.json();
 
         if (data.success) {
-            updateCartCount(data.cart_count);
-            showNotification(data.message, 'success');
+            updateCartBadge(data.cart_count);
+            showCartNotification(data.message, 'success', 'trash');
             loadCartItems();
         } else {
-            showNotification(data.message, 'error');
+            showCartNotification(data.message || 'Failed to remove item', 'error', 'x-circle');
         }
     } catch (error) {
         console.error('Error removing from cart:', error);
-        showNotification('Failed to remove from cart', 'error');
+        showCartNotification('Failed to remove from cart', 'error', 'x-circle');
     }
 }
 
 // Update cart quantity
 async function updateCartQuantity(cartId, quantity) {
+    if (quantity < 1) {
+        removeFromCart(cartId);
+        return;
+    }
+
     const formData = new FormData();
     formData.append('action', 'update');
     formData.append('cart_id', cartId);
@@ -81,14 +87,14 @@ async function updateCartQuantity(cartId, quantity) {
         const data = await response.json();
 
         if (data.success) {
-            updateCartCount(data.cart_count);
+            updateCartBadge(data.cart_count);
             loadCartItems();
         } else {
-            showNotification(data.message, 'error');
+            showCartNotification(data.message || 'Failed to update quantity', 'error', 'x-circle');
         }
     } catch (error) {
         console.error('Error updating cart:', error);
-        showNotification('Failed to update cart', 'error');
+        showCartNotification('Failed to update cart', 'error', 'x-circle');
     }
 }
 
@@ -107,6 +113,10 @@ async function loadCartItems() {
 
         if (data.success) {
             renderCartItems(data.items, data.total);
+            // Also update badge from server data
+            if (data.cart_count !== undefined) {
+                updateCartBadge(data.cart_count, false);
+            }
         }
     } catch (error) {
         console.error('Error loading cart:', error);
@@ -163,20 +173,40 @@ function renderCartItems(items, total) {
     }
 }
 
-// Update cart count badge
-function updateCartCount(count) {
-    const badges = document.querySelectorAll('.navbar-nav .badge.bg-danger');
-    badges.forEach(badge => {
-        const parent = badge.parentElement;
-        if (parent && parent.title === 'Cart') {
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline';
-            } else {
-                badge.style.display = 'none';
-            }
+// Update cart badge with animation
+function updateCartBadge(count, animate = true) {
+    // Find cart link by looking for the cart icon or onclick handler
+    const cartLink = document.querySelector('a[onclick*="openCart"]') ||
+                     document.querySelector('a[title="Cart"]');
+
+    if (!cartLink) return;
+
+    let badge = cartLink.querySelector('.badge');
+
+    if (count > 0) {
+        if (!badge) {
+            // Create badge if it doesn't exist
+            badge = document.createElement('span');
+            badge.className = 'badge bg-danger';
+            cartLink.appendChild(badge);
         }
-    });
+
+        badge.textContent = count;
+        badge.style.display = 'inline';
+
+        // Add bounce animation
+        if (animate) {
+            badge.style.transform = 'scale(1.3)';
+            badge.style.transition = 'transform 0.2s ease';
+            setTimeout(() => {
+                badge.style.transform = 'scale(1)';
+            }, 200);
+        }
+    } else {
+        if (badge) {
+            badge.style.display = 'none';
+        }
+    }
 }
 
 // Open cart sidebar
@@ -204,21 +234,67 @@ function closeCart() {
     }
 }
 
-// Show notification
-function showNotification(message, type = 'info') {
+// Enhanced cart notification with icons
+function showCartNotification(message, type = 'info', icon = 'info-circle') {
+    // Remove existing cart notifications
+    const existing = document.querySelectorAll('.cart-notification');
+    existing.forEach(el => el.remove());
+
+    // Determine colors and icons
+    let bgColor, iconClass;
+    switch(type) {
+        case 'success':
+            bgColor = 'bg-success';
+            iconClass = `bi-${icon}`;
+            break;
+        case 'error':
+            bgColor = 'bg-danger';
+            iconClass = 'bi-x-circle';
+            break;
+        default:
+            bgColor = 'bg-info';
+            iconClass = 'bi-info-circle';
+    }
+
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed top-0 start-50 translate-middle-x mt-3`;
-    notification.style.zIndex = '9999';
-    notification.style.minWidth = '300px';
-    notification.textContent = message;
+    notification.className = `cart-notification position-fixed d-flex align-items-center gap-2 text-white px-4 py-3 rounded-3 shadow-lg ${bgColor}`;
+    notification.style.cssText = `
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        z-index: 10000;
+        min-width: 280px;
+        max-width: 400px;
+        opacity: 0;
+        transition: all 0.3s ease;
+    `;
+
+    notification.innerHTML = `
+        <i class="bi ${iconClass}" style="font-size: 1.25rem;"></i>
+        <span style="flex: 1;">${message}</span>
+        <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.75rem;" onclick="this.parentElement.remove()"></button>
+    `;
 
     document.body.appendChild(notification);
 
-    // Remove after 3 seconds
+    // Animate in
+    requestAnimationFrame(() => {
+        notification.style.transform = 'translateX(-50%) translateY(0)';
+        notification.style.opacity = '1';
+    });
+
+    // Auto remove after 3 seconds
     setTimeout(() => {
-        notification.remove();
+        notification.style.transform = 'translateX(-50%) translateY(-20px)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
+}
+
+// Legacy notification function (for compatibility)
+function showNotification(message, type = 'info') {
+    showCartNotification(message, type);
 }
 
 // Initialize cart on page load

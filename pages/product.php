@@ -217,7 +217,7 @@ include __DIR__ . '/../includes/navbar.php';
                     <button class="btn btn-primary btn-lg" onclick="addToCartWithQuantity(<?= $product['id'] ?>)">
                         <i class="bi bi-cart-plus"></i> Add to Cart
                     </button>
-                    <button class="btn btn-outline-secondary btn-lg" id="wishlist-btn-<?= $product['id'] ?>" onclick="toggleWishlist(<?= $product['id'] ?>)">
+                    <button class="btn btn-outline-secondary btn-lg" id="wishlist-btn-<?= $product['id'] ?>" onclick="toggleProductWishlist(<?= $product['id'] ?>)">
                         <i class="bi bi-heart"></i> <span id="wishlist-text-<?= $product['id'] ?>">Add to Wishlist</span>
                     </button>
                 <?php else: ?>
@@ -314,8 +314,8 @@ function addToCartWithQuantity(productId) {
     addToCart(productId, quantity);
 }
 
-// Toggle wishlist
-async function toggleWishlist(productId) {
+// Toggle wishlist for product page
+async function toggleProductWishlist(productId) {
     const btn = document.getElementById('wishlist-btn-' + productId);
     const text = document.getElementById('wishlist-text-' + productId);
     const icon = btn.querySelector('i');
@@ -343,6 +343,7 @@ async function toggleWishlist(productId) {
                 btn.classList.remove('btn-danger');
                 btn.classList.add('btn-outline-secondary');
                 text.textContent = 'Add to Wishlist';
+                updateWishlistBadge(-1);
             } else {
                 // Added to wishlist
                 icon.classList.remove('bi-heart');
@@ -350,10 +351,11 @@ async function toggleWishlist(productId) {
                 btn.classList.remove('btn-outline-secondary');
                 btn.classList.add('btn-danger');
                 text.textContent = 'In Wishlist';
+                updateWishlistBadge(1);
             }
             showNotification(data.message, 'success');
         } else {
-            showNotification(data.message, 'error');
+            showNotification(data.message || 'Failed to update wishlist', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -393,8 +395,12 @@ async function checkWishlist(productId) {
 
 // Show notification
 function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existing = document.querySelector('.product-notification');
+    if (existing) existing.remove();
+
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+    notification.className = `alert alert-${type === 'error' ? 'danger' : 'success'} product-notification position-fixed top-0 start-50 translate-middle-x mt-3`;
     notification.style.zIndex = '9999';
     notification.style.minWidth = '300px';
     notification.textContent = message;
@@ -404,6 +410,30 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         notification.remove();
     }, 3000);
+}
+
+// Update wishlist badge in navbar
+function updateWishlistBadge(change) {
+    const wishlistLink = document.querySelector('a[href="wishlist.php"]');
+    if (!wishlistLink) return;
+
+    let badge = wishlistLink.querySelector('.badge');
+
+    if (badge) {
+        const currentCount = parseInt(badge.textContent) || 0;
+        const newCount = Math.max(0, currentCount + change);
+
+        if (newCount > 0) {
+            badge.textContent = newCount;
+        } else {
+            badge.remove();
+        }
+    } else if (change > 0) {
+        const newBadge = document.createElement('span');
+        newBadge.className = 'badge bg-danger';
+        newBadge.textContent = '1';
+        wishlistLink.appendChild(newBadge);
+    }
 }
 
 // Check wishlist status on page load

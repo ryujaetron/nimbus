@@ -174,6 +174,55 @@
         [data-bs-theme="dark"] #navbarSearchInput::placeholder {
             color: #adb5bd;
         }
+
+        /* Footer Styles */
+        .site-footer {
+            background-color: #f8f9fa;
+            color: #212529;
+            border-top: 1px solid #dee2e6;
+        }
+        .site-footer h5,
+        .site-footer h6 {
+            color: #212529;
+        }
+        .footer-text {
+            color: #6c757d;
+        }
+        .footer-link {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-link:hover {
+            color: #20c997;
+        }
+        .footer-divider {
+            border-color: #dee2e6;
+            opacity: 0.5;
+        }
+
+        /* Footer Dark Mode */
+        [data-bs-theme="dark"] .site-footer {
+            background-color: #1a1a1a;
+            color: #e9ecef;
+            border-top-color: #333;
+        }
+        [data-bs-theme="dark"] .site-footer h5,
+        [data-bs-theme="dark"] .site-footer h6 {
+            color: #e9ecef;
+        }
+        [data-bs-theme="dark"] .footer-text {
+            color: #adb5bd;
+        }
+        [data-bs-theme="dark"] .footer-link {
+            color: #adb5bd;
+        }
+        [data-bs-theme="dark"] .footer-link:hover {
+            color: #20c997;
+        }
+        [data-bs-theme="dark"] .footer-divider {
+            border-color: #444;
+        }
     </style>
 
     <?php if (isset($extra_css)): ?>

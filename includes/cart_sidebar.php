@@ -68,7 +68,7 @@
     right: -400px;
     width: 400px;
     height: 100%;
-    background: white;
+    background: #ffffff;
     z-index: 1050;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     transition: right 0.3s;
@@ -86,12 +86,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #ffffff;
+}
+
+.cart-header h5 {
+    color: #212529;
 }
 
 .cart-body {
     flex: 1;
     overflow-y: auto;
     padding: 1.5rem;
+    background: #ffffff;
+}
+
+.cart-body h6 {
+    color: #212529;
 }
 
 .cart-footer {
@@ -106,6 +116,73 @@
     object-fit: cover;
     border-radius: 8px;
     background: #f8f9fa;
+}
+
+.cart-item {
+    border-bottom-color: #dee2e6 !important;
+}
+
+/* Dark Mode Styles */
+[data-bs-theme="dark"] .cart-sidebar {
+    background: #1e1e1e;
+    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .cart-header {
+    background: #1e1e1e;
+    border-bottom-color: #333;
+}
+
+[data-bs-theme="dark"] .cart-header h5 {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .cart-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="dark"] .cart-body {
+    background: #1e1e1e;
+}
+
+[data-bs-theme="dark"] .cart-body h6 {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .cart-footer {
+    background: #2d2d2d;
+    border-top-color: #333;
+}
+
+[data-bs-theme="dark"] .cart-footer strong {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .cart-item-img {
+    background: #3d3d3d;
+}
+
+[data-bs-theme="dark"] .cart-item {
+    border-bottom-color: #333 !important;
+}
+
+[data-bs-theme="dark"] #emptyCartMessage i {
+    color: #555 !important;
+}
+
+[data-bs-theme="dark"] #emptyCartMessage .text-muted {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    color: #adb5bd;
+    border-color: #555;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: #3d3d3d;
+    border-color: #666;
+    color: #e9ecef;
 }
 
 @media (max-width: 768px) {

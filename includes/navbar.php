@@ -21,26 +21,41 @@
                         <i class="bi bi-grid"></i> Products
                     </a>
                 </li>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link <?= (isset($current_page) && $current_page == 'orders') ? 'active' : '' ?>" href="order_history.php">
+                            <i class="bi bi-clock-history"></i> Orders
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+            <ul class="navbar-nav align-items-center">
+                <!-- Wishlist (for all users) -->
                 <li class="nav-item">
-                    <a class="nav-link <?= (isset($current_page) && $current_page == 'cart') ? 'active' : '' ?>" href="cart.php">
-                        <i class="bi bi-cart"></i> Cart
-                        <?php if (isset($_SESSION['cart_count']) && $_SESSION['cart_count'] > 0): ?>
-                            <span class="badge bg-danger"><?= $_SESSION['cart_count'] ?></span>
+                    <a class="nav-link" href="wishlist.php" title="Wishlist">
+                        <i class="bi bi-heart"></i>
+                        <?php
+                        $wishlist_count = isset($_SESSION['wishlist_count']) ? $_SESSION['wishlist_count'] : 0;
+                        if ($wishlist_count > 0):
+                        ?>
+                            <span class="badge bg-danger"><?= $wishlist_count ?></span>
                         <?php endif; ?>
                     </a>
                 </li>
+
+                <!-- Cart (for all users) -->
                 <li class="nav-item">
-                    <a class="nav-link <?= (isset($current_page) && $current_page == 'wishlist') ? 'active' : '' ?>" href="wishlist.php">
-                        <i class="bi bi-heart"></i> Wishlist
+                    <a class="nav-link" href="#" onclick="openCart(); return false;" title="Cart">
+                        <i class="bi bi-cart"></i>
+                        <?php
+                        $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
+                        if ($cart_count > 0):
+                        ?>
+                            <span class="badge bg-danger"><?= $cart_count ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= (isset($current_page) && $current_page == 'orders') ? 'active' : '' ?>" href="order_history.php">
-                        <i class="bi bi-clock-history"></i> Orders
-                    </a>
-                </li>
-            </ul>
-            <ul class="navbar-nav align-items-center">
+
                 <!-- Search Icon (shows by default) -->
                 <li class="nav-item" id="searchIcon">
                     <a class="nav-link" href="#" onclick="toggleSearch(event)" title="Search">
@@ -68,25 +83,85 @@
                     </form>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['user_name']) ?>
+                <!-- Dark Mode Toggle -->
+                <li class="nav-item">
+                    <a class="nav-link theme-toggle" href="#" onclick="toggleDarkMode(event)" title="Toggle Dark Mode">
+                        <i class="bi bi-moon-fill" id="themeIcon"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
-                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                            <li><a class="dropdown-item" href="../admin/dashboard.php"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
-                        <?php endif; ?>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="../auth/logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-                    </ul>
                 </li>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <!-- Logged-in User Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['user_name']) ?>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
+                            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                <li><a class="dropdown-item" href="../admin/dashboard.php"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="../auth/logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                <?php else: ?>
+                    <!-- Guest User - Account Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="guestDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="../auth/login.php">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a></li>
+                            <li><a class="dropdown-item" href="../auth/register.php">
+                                <i class="bi bi-person-plus"></i> Create Account
+                            </a></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
 </nav>
 
 <script>
+// Dark Mode Toggle
+function toggleDarkMode(event) {
+    event.preventDefault();
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-bs-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    html.setAttribute('data-bs-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+}
+
+// Initialize theme icon on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+    updateThemeIcon(currentTheme);
+});
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    // Only auto-switch if user hasn't manually set a preference
+    if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+});
+
 function toggleSearch(event) {
     event.preventDefault();
     const searchIcon = document.getElementById('searchIcon');

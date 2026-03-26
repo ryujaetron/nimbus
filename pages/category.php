@@ -1,6 +1,8 @@
 <?php
-// Include authentication check
-require_once __DIR__ . '/../includes/auth_check.php';
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Include database connection
 require_once __DIR__ . '/../config/db.php';
@@ -102,7 +104,7 @@ include __DIR__ . '/../includes/navbar.php';
         <?php if ($featured_result->num_rows > 0): ?>
             <?php while ($product = $featured_result->fetch_assoc()): ?>
                 <div class="col-md-6 col-lg-3">
-                    <div class="card product-card h-100">
+                    <div class="card product-card h-100 position-relative">
                         <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none">
                             <div class="product-img">
                                 <?php if ($product['image']): ?>
@@ -110,9 +112,18 @@ include __DIR__ . '/../includes/navbar.php';
                                 <?php else: ?>
                                     <i class="bi bi-image" style="font-size: 80px; color: #dee2e6;"></i>
                                 <?php endif; ?>
-                                <span class="badge badge-featured position-absolute top-0 end-0 m-2">Featured</span>
+                                <span class="badge badge-featured position-absolute" style="top: 10px; left: 10px;">Featured</span>
                             </div>
                         </a>
+
+                        <!-- Wishlist Heart Button -->
+                        <button class="btn btn-sm wishlist-btn position-absolute"
+                                style="top: 10px; right: 10px; z-index: 10; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 35px; height: 35px; backdrop-filter: blur(5px);"
+                                onclick="toggleWishlist(<?= $product['id'] ?>, this)"
+                                title="Add to wishlist">
+                            <i class="bi bi-heart text-danger"></i>
+                        </button>
+
                         <div class="card-body">
                             <div class="mb-2">
                                 <small class="text-muted"><?= e($product['category_name']) ?></small>

@@ -1,6 +1,8 @@
 <?php
-// Include authentication check
-require_once __DIR__ . '/../includes/auth_check.php';
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Include database connection
 require_once __DIR__ . '/../config/db.php';
@@ -212,11 +214,11 @@ include __DIR__ . '/../includes/navbar.php';
 
             <div class="d-grid gap-2 d-md-flex">
                 <?php if ($product['stock'] > 0): ?>
-                    <button class="btn btn-primary btn-lg" onclick="addToCart(<?= $product['id'] ?>)">
+                    <button class="btn btn-primary btn-lg" onclick="addToCartWithQuantity(<?= $product['id'] ?>)">
                         <i class="bi bi-cart-plus"></i> Add to Cart
                     </button>
-                    <button class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-heart"></i> Add to Wishlist
+                    <button class="btn btn-outline-secondary btn-lg" id="wishlist-btn-<?= $product['id'] ?>" onclick="toggleWishlist(<?= $product['id'] ?>)">
+                        <i class="bi bi-heart"></i> <span id="wishlist-text-<?= $product['id'] ?>">Add to Wishlist</span>
                     </button>
                 <?php else: ?>
                     <button class="btn btn-secondary btn-lg" disabled>
@@ -304,6 +306,112 @@ include __DIR__ . '/../includes/navbar.php';
         </div>
     <?php endif; ?>
 </div>
+
+<script>
+// Add to cart with quantity
+function addToCartWithQuantity(productId) {
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
+    addToCart(productId, quantity);
+}
+
+// Toggle wishlist
+async function toggleWishlist(productId) {
+    const btn = document.getElementById('wishlist-btn-' + productId);
+    const text = document.getElementById('wishlist-text-' + productId);
+    const icon = btn.querySelector('i');
+
+    // Check if already in wishlist
+    const isInWishlist = icon.classList.contains('bi-heart-fill');
+
+    const formData = new FormData();
+    formData.append('action', isInWishlist ? 'remove' : 'add');
+    formData.append('product_id', productId);
+
+    try {
+        const response = await fetch('../handlers/wishlist_handler.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            if (isInWishlist) {
+                // Removed from wishlist
+                icon.classList.remove('bi-heart-fill');
+                icon.classList.add('bi-heart');
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-secondary');
+                text.textContent = 'Add to Wishlist';
+            } else {
+                // Added to wishlist
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill');
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-danger');
+                text.textContent = 'In Wishlist';
+            }
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Failed to update wishlist', 'error');
+    }
+}
+
+// Check if product is in wishlist on page load
+async function checkWishlist(productId) {
+    const formData = new FormData();
+    formData.append('action', 'check');
+    formData.append('product_id', productId);
+
+    try {
+        const response = await fetch('../handlers/wishlist_handler.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.in_wishlist) {
+            const btn = document.getElementById('wishlist-btn-' + productId);
+            const text = document.getElementById('wishlist-text-' + productId);
+            const icon = btn.querySelector('i');
+
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-danger');
+            text.textContent = 'In Wishlist';
+        }
+    } catch (error) {
+        console.error('Error checking wishlist:', error);
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Check wishlist status on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const productId = <?= $product['id'] ?>;
+    checkWishlist(productId);
+});
+</script>
 
 <?php
 // Close database connection

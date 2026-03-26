@@ -29,11 +29,17 @@
         </div>
     </footer>
 
+    <!-- Cart Sidebar -->
+    <?php include __DIR__ . '/cart_sidebar.php'; ?>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Cart JS -->
     <script src="../assets/js/cart.js"></script>
+
+    <!-- Wishlist JS -->
+    <script src="../assets/js/wishlist.js"></script>
 
     <!-- Custom JS -->
     <?php if (isset($extra_js)): ?>

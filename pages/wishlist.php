@@ -44,14 +44,14 @@ if ($is_guest) {
     }
 } else {
     // Logged-in user - get from database
-    $sql = "SELECT w.id as wishlist_id, w.added_at,
+    $sql = "SELECT w.id as wishlist_id, w.created_at as added_at,
                    p.id, p.name, p.description, p.price, p.sale_price, p.image, p.stock, p.is_active,
                    c.name as category_name
-            FROM wishlist w
+            FROM wishlists w
             JOIN products p ON w.product_id = p.id
             LEFT JOIN categories c ON p.category_id = c.id
             WHERE w.user_id = ?
-            ORDER BY w.added_at DESC";
+            ORDER BY w.created_at DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();

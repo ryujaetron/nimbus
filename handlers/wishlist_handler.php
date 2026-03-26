@@ -50,7 +50,7 @@ if ($action === 'add') {
         $_SESSION['wishlist_count'] = count($_SESSION['guest_wishlist']);
     } else {
         // Logged-in user - store in database
-        $check_sql = "SELECT id FROM wishlist WHERE user_id = ? AND product_id = ?";
+        $check_sql = "SELECT id FROM wishlists WHERE user_id = ? AND product_id = ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("ii", $user_id, $product_id);
         $check_stmt->execute();
@@ -62,7 +62,7 @@ if ($action === 'add') {
             exit;
         }
 
-        $insert_sql = "INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)";
+        $insert_sql = "INSERT INTO wishlists (user_id, product_id) VALUES (?, ?)";
         $insert_stmt = $conn->prepare($insert_sql);
         $insert_stmt->bind_param("ii", $user_id, $product_id);
 
@@ -72,7 +72,7 @@ if ($action === 'add') {
             exit;
         }
 
-        $count_sql = "SELECT COUNT(*) as total FROM wishlist WHERE user_id = ?";
+        $count_sql = "SELECT COUNT(*) as total FROM wishlists WHERE user_id = ?";
         $count_stmt = $conn->prepare($count_sql);
         $count_stmt->bind_param("i", $user_id);
         $count_stmt->execute();
@@ -105,12 +105,12 @@ elseif ($action === 'remove') {
         $_SESSION['wishlist_count'] = count($_SESSION['guest_wishlist']);
     } else {
         // Logged-in user remove
-        $delete_sql = "DELETE FROM wishlist WHERE user_id = ? AND product_id = ?";
+        $delete_sql = "DELETE FROM wishlists WHERE user_id = ? AND product_id = ?";
         $delete_stmt = $conn->prepare($delete_sql);
         $delete_stmt->bind_param("ii", $user_id, $product_id);
         $delete_stmt->execute();
 
-        $count_sql = "SELECT COUNT(*) as total FROM wishlist WHERE user_id = ?";
+        $count_sql = "SELECT COUNT(*) as total FROM wishlists WHERE user_id = ?";
         $count_stmt = $conn->prepare($count_sql);
         $count_stmt->bind_param("i", $user_id);
         $count_stmt->execute();
@@ -138,7 +138,7 @@ elseif ($action === 'check') {
         $in_wishlist = in_array($product_id, $_SESSION['guest_wishlist']);
     } else {
         // Logged-in user check
-        $check_sql = "SELECT id FROM wishlist WHERE user_id = ? AND product_id = ?";
+        $check_sql = "SELECT id FROM wishlists WHERE user_id = ? AND product_id = ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("ii", $user_id, $product_id);
         $check_stmt->execute();

@@ -1,0 +1,1 @@
+vendor sees only orders containing their products

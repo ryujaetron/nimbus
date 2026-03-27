@@ -1,0 +1,1 @@
+admin approves/rejects vendor applications

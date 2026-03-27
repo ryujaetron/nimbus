@@ -129,7 +129,7 @@ include __DIR__ . '/../includes/navbar.php';
                         <a href="product.php?id=<?= $product['id'] ?>" class="text-decoration-none">
                             <div class="product-img">
                                 <?php if ($product['image']): ?>
-                                    <img src="riding-gloves.jpg/uploads/products/<?= e($product['image']) ?>" class="card-img-top" alt="<?= e($product['name']) ?>">
+                                    <img src="../uploads/products/<?= e($product['image']) ?>" class="card-img-top" alt="<?= e($product['name']) ?>">
                                 <?php else: ?>
                                     <i class="bi bi-image" style="font-size: 80px; color: #dee2e6;"></i>
                                 <?php endif; ?>

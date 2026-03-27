@@ -72,11 +72,23 @@
         }
         .product-img {
             height: 200px;
-            object-fit: cover;
+            width: 100%;
             background: var(--product-img-bg);
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-img img {
+            transform: scale(1.05);
         }
         .badge-featured {
             background-color: #ffc107;

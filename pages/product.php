@@ -101,8 +101,23 @@ $extra_css = "
     }
     .related-product-img {
         height: 150px;
+        width: 100%;
+        background: var(--product-img-bg, #f8f9fa);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .related-product-img img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        background: #f8f9fa;
+        object-position: center;
+        transition: transform 0.3s ease;
+    }
+    .product-card:hover .related-product-img img {
+        transform: scale(1.05);
     }
 </style>
 ";
